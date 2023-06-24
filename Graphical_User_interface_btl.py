@@ -297,8 +297,8 @@ but_Create_key = Button(root, text = 'Tạo khoá',bg='Cyan',width = '10', comma
 but_Create_key.place(x= 130, y=360)
 but_Delete_key = Button(root, text = 'Xoá khoá',bg='Cyan',width = '10', command=delete_key)
 but_Delete_key.place(x= 130, y=390)
-but_Delete_key = Button(root, text = 'Tạo khoá ngẫu nhiên',bg='Cyan',width = '10', command=random_key)
-but_Delete_key.place(x= 130, y=430)
+but_Delete_key = Button(root, text = 'Tạo khoá ngẫu nhiên',bg='Cyan',width = '21', command=random_key)
+but_Delete_key.place(x= 90, y=430)
 
 # Mã hoá
 title_Encrypt = Label(root,text = 'Mã hoá', font=('Arial Black',14))
