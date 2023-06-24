@@ -1,10 +1,34 @@
 from tkinter import *
 import numpy as np
 import re
+import random
 
 
 Duong_dan_ban_ro = 'C:\\Users\\theta\\OneDrive\\Desktop\\ban_ro.txt'
 Duong_dan_ban_ma = 'C:\\Users\\theta\\OneDrive\\Desktop\\ban_ma.txt'
+
+
+
+def is_prime(n):
+    if n <= 1:
+        return False
+    if n <= 3:
+        return True
+    if n % 2 == 0 or n % 3 == 0:
+        return False
+    i = 5
+    while i * i <= n:
+        if n % i == 0 or n % (i + 2) == 0:
+            return False
+        i += 6
+    return True
+
+def generate_random_prime(start, end):
+    while True:
+        number = random.randint(start, end)
+        if is_prime(number):
+            return number
+
 
 
 # Hàm chuyển đổi ký tự sang số
@@ -107,7 +131,48 @@ def decrypt():
         print('Không thể giải mãi!')
 
 
+def random_key():
+    p = generate_random_prime(9000, 900000)
+    Alpha = generate_random_prime(2, 200)
+    a = generate_random_prime(200, 8999)
+    text_P.delete(0, END)
+    text_P.insert(END, str(p))
+    text_Alpha.delete(0, END)
+    text_Alpha.insert(END, str(Alpha))
+    text_a.delete(0, END)
+    text_a.insert(END, str(a))
+    
+    # Lấy dữ liệu tham số từ người dùng nhập
+    p = int(text_P.get())
+    Alpha = int(text_Alpha.get())
+    a = int(text_a.get())
+    
+    # Tính Beta
+    beta = pow_modulo(Alpha, a, p)
+    
+    # Tạo khoá
+    private_key = (p, a)
+    public_key = (p, Alpha, beta)
+    
+    # Chèn kết quả khoá vào ô
+    text_private_key.delete(0, END)    
+    text_private_key.insert(END, str(private_key))
+    text_public_key.delete(0, END)
+    text_public_key.insert(END, str(public_key))
+    print('Đã tạo khoá thành công!')
+
 def create_key():
+    if have_random_key:
+        p = generate_random_prime(9000, 900000)
+        Alpha = generate_random_prime(2, 200)
+        a = generate_random_prime(200, 8999)
+        text_P.delete(0, END)
+        text_P.insert(END, str(p))
+        text_Alpha.delete(0, END)
+        text_Alpha.insert(END, str(Alpha))
+        text_a.delete(0, END)
+        text_a.insert(END, str(a))
+    
     # Lấy dữ liệu tham số từ người dùng nhập
     p = int(text_P.get())
     Alpha = int(text_Alpha.get())
@@ -143,9 +208,10 @@ def read_text_file_encrypt(file_path=None):
     file_path = str(text_path_encrypt_ban_ro.get())
     try:
         with open(file_path, 'r', encoding='utf-8') as file:
-            text = file.read()
+            text = ''.join(file.read())
             text_encrypt_ban_ro.delete(0, END)
-            text_encrypt_ban_ro.insert(END, text)
+            text_encrypt_ban_ro.insert(0, text)
+            print(text_encrypt_ban_ro.get())
     except IOError:
         print("Không thể đọc file.")
 
@@ -231,7 +297,8 @@ but_Create_key = Button(root, text = 'Tạo khoá',bg='Cyan',width = '10', comma
 but_Create_key.place(x= 130, y=360)
 but_Delete_key = Button(root, text = 'Xoá khoá',bg='Cyan',width = '10', command=delete_key)
 but_Delete_key.place(x= 130, y=390)
-
+but_Delete_key = Button(root, text = 'Tạo khoá ngẫu nhiên',bg='Cyan',width = '10', command=random_key)
+but_Delete_key.place(x= 130, y=430)
 
 # Mã hoá
 title_Encrypt = Label(root,text = 'Mã hoá', font=('Arial Black',14))
