@@ -3,11 +3,15 @@ import numpy as np
 import re
 
 
+Duong_dan_ban_ro = 'C:\\Users\\theta\\OneDrive\\Desktop\\ban_ro.txt'
+Duong_dan_ban_ma = 'C:\\Users\\theta\\OneDrive\\Desktop\\ban_ma.txt'
+
+
 # Hàm chuyển đổi ký tự sang số
 def text_to_numbers(text):
     numbers = []
     for char in text:
-        number = ord(char)  # Chuyển đổi ký tự thành mã ASCII
+        number = ord(char)  # Chuyển đổi ký tự thành mã UTF-8
         numbers.append(number)
     return numbers
 
@@ -16,9 +20,22 @@ def text_to_numbers(text):
 def numbers_to_text(numbers):
     text = ""
     for number in numbers:
-        char = chr(number)  # Chuyển đổi mã ASCII thành ký tự
+        char = chr(number)  # Chuyển đổi mã UTF-8 thành ký tự
         text += char
     return text
+
+# Hàm modulo luỹ thừa
+def pow_modulo(base, exponent, modulo):
+    result = 1
+    base %= modulo
+
+    while exponent > 0:
+        if exponent % 2 == 1:
+            result = (result * base) % modulo
+        exponent //= 2
+        base = (base * base) % modulo
+
+    return result
 
 
 # Hàm tính nghịch đảo modulo
@@ -35,7 +52,6 @@ def mod_inverse(a, m):
         x1 += m0
     return x1
 
-
             
 # Hàm mã hoá Elgamal
 def encrypt():
@@ -46,14 +62,14 @@ def encrypt():
         
         k = np.random.randint(1, p - 1)  # Chọn số ngẫu nhiên k
         
-        text = text_to_numbers(text_ban_ro.get()) # lấy văn bản rõ từ file
+        text = text_to_numbers(text_encrypt_ban_ro.get()) # lấy văn bản rõ từ file
                 
         for i in range(len(text)):
-            y1 = pow(alpha, k, p)
-            y2 = (text[i] * pow(beta, k, p)) % p
+            y1 = pow_modulo(alpha, k, p)
+            y2 = (text[i] * pow_modulo(beta, k, p)) % p
             cipher.append((y1, y2))
-        text_code_text_encrypt.delete(0, END)
-        text_code_text_encrypt.insert(END, str(cipher)[1:-1])
+        text_encrypt_ban_ma.delete(0, END)
+        text_encrypt_ban_ma.insert(END, str(cipher)[1:-1])
     except IOError:
         print('Không thể mã hoá!')
 
@@ -77,29 +93,18 @@ def decrypt():
     p, a = int(private_key[0].strip()), int(private_key[1].strip())
     plain_text = []
     
-    data = '[' +text_code_text_decrypt.get() + ']' # Lấy đoạn mã đã bị mã hoá
+    data = '[' +text_decrypt_ban_ma.get() + ']' # Lấy đoạn mã đã bị mã hoá
     cipher = convert_string_to_tuple_list(data)
     
     try:
         for c in cipher:
             y1, y2 = c
-            r_inv = mod_inverse(pow(y1, a, p), p)  # Tính nghịch đảo của r^x (mod p)
+            r_inv = mod_inverse(pow_modulo(y1, a, p), p)  # Tính nghịch đảo của r^x (mod p)
             plain_text.append((y2 * r_inv) % p)
-        text_giai_ma.delete(0, END)
-        text_giai_ma.insert(END, numbers_to_text(plain_text))
+        text_decrypt_ban_ro.delete(0, END)
+        text_decrypt_ban_ro.insert(END, numbers_to_text(plain_text))
     except IOError:
         print('Không thể giải mãi!')
-    
-
-def read_text_file(file_path=None):
-    file_path = str(text_path_1.get())
-    try:
-        with open(file_path, 'r', encoding='utf-8') as file:
-            text = file.read()
-            text_ban_ro.delete(0, END)
-            text_ban_ro.insert(END, text)
-    except IOError:
-        print("Không thể đọc file.")
 
 
 def create_key():
@@ -109,7 +114,7 @@ def create_key():
     a = int(text_a.get())
     
     # Tính Beta
-    beta = pow(Alpha, a, p)
+    beta = pow_modulo(Alpha, a, p)
     
     # Tạo khoá
     private_key = (p, a)
@@ -130,28 +135,50 @@ def delete_key():
 
 
 def push_code():
-    text_code_text_decrypt.delete(0, END)
-    text_code_text_decrypt.insert(END, text_code_text_encrypt.get())
-
-
-def save_encrypt_file():
-    encrypt = text_code_text_encrypt.get()
+    text_decrypt_ban_ma.delete(0, END)
+    text_decrypt_ban_ma.insert(END, text_encrypt_ban_ma.get())
+    
+    
+def read_text_file_encrypt(file_path=None):
+    file_path = str(text_path_encrypt_ban_ro.get())
     try:
-        with open('encrypt.txt', 'w') as file:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            text = file.read()
+            text_encrypt_ban_ro.delete(0, END)
+            text_encrypt_ban_ro.insert(END, text)
+    except IOError:
+        print("Không thể đọc file.")
+
+
+def save_text_file_encrypt():
+    encrypt = text_encrypt_ban_ma.get()
+    try:
+        with open(Duong_dan_ban_ma, 'w') as file:
             file.write(encrypt)
         print("Ghi file thành công.")
     except IOError:
         print("Không thể ghi file.")
 
 
-def read_encrypt_file():
+def read_text_file_decrypt():
+    file_path = str(text_path_decrypt_ban_ma.get())
     try:
-        with open('encrypt.txt', 'r', encoding='utf-8') as file:
+        with open(file_path, 'r', encoding='utf-8') as file:
             text = file.read()
-            text_.delete(0, END)
-            text_ban_ro.insert(END, text)
+            text_decrypt_ban_ma.delete(0, END)
+            text_decrypt_ban_ma.insert(END, text)
     except IOError:
         print("Không thể đọc file.")
+        
+        
+def save_text_file_decrypt():
+    encrypt = str(text_decrypt_ban_ro.get())
+    try:
+        with open(Duong_dan_ban_ro, 'w', encoding='utf-8') as file:
+            file.write(encrypt)
+        print("Ghi file thành công.")
+    except IOError:
+        print("Không thể ghi file.")
 
 
 # Thiết kế giao diện
@@ -207,58 +234,64 @@ but_Delete_key.place(x= 130, y=390)
 
 
 # Mã hoá
-label_Encrypt = Label(root,text = 'Mã hoá', font=('Arial Black',14))
-label_Encrypt.place(x=350,y=60)
+title_Encrypt = Label(root,text = 'Mã hoá', font=('Arial Black',14))
+title_Encrypt.place(x=350,y=60)
 
-label_ban_ro = Label(root,text= 'Đường dẫn')
-label_ban_ro.place(x= 350,y=100)
-text_path_1 = Entry(root)
-text_path_1.place(x= 420 , y= 100, width=220, height=20)
+label_path_encrypt_ban_ro = Label(root,text= 'Đường dẫn')
+label_path_encrypt_ban_ro.place(x= 350,y=100)
+text_path_encrypt_ban_ro = Entry(root)
+text_path_encrypt_ban_ro.place(x= 420 , y= 100, width=220, height=20)
 
-but_File_text = Button(root, text = 'Tệp văn bản',bg='Cyan',width = '10', command=read_text_file)
+but_File_text = Button(root, text = 'Tệp văn bản',bg='Cyan',width = '10', command=read_text_file_encrypt)
 but_File_text.place(x= 650,y=100)
 
-label_ban_ro = Label(root,text= 'Văn bản')
-label_ban_ro.place(x= 350,y=170)
-
-text_ban_ro = Entry(root)
-text_ban_ro.place(x= 420 , y= 150, width=220, height=100)
+label_encrypt_ban_ro = Label(root,text= 'Bản rõ')
+label_encrypt_ban_ro.place(x= 350,y=170)
+text_encrypt_ban_ro = Entry(root)
+text_encrypt_ban_ro.place(x= 420 , y= 150, width=220, height=100)
 
 but_Encrypt = Button(root, text = 'Mã hoá',bg='Cyan',width = '10', command=encrypt)
 but_Encrypt.place(x= 470,y=280)
 
-label_code_text_encrypt = Label(root,text= 'Codetext')
-label_code_text_encrypt.place(x= 350, y= 330)
-text_code_text_encrypt = Entry(root)
-text_code_text_encrypt.place(x= 420 , y= 360, width=220, height=100)
+label_encrypt_ban_ma = Label(root,text= 'Bản mã')
+label_encrypt_ban_ma.place(x= 350, y= 330)
+text_encrypt_ban_ma = Entry(root)
+text_encrypt_ban_ma.place(x= 420 , y= 360, width=220, height=100)
 
 but_push = Button(root, text= 'Chuyển', bg = 'Cyan', width = '10', command=push_code)
 but_push.place(x= 650 , y = 360 )
 
-but_store_encrypt = Button(root, text= 'Lưu', bg = 'Cyan', width = '10', command=save_encrypt_file)
+but_store_encrypt = Button(root, text= 'Lưu', bg = 'Cyan', width = '10', command=save_text_file_encrypt)
 but_store_encrypt.place(x= 650 , y = 390 )
 
 
 # Giải mã
-label_Decrypt = Label(root, text ='Giải mã',font=('Arial Black',14))
-label_Decrypt.place(x= 770,y=60)
+title_Decrypt = Label(root, text ='Giải mã',font=('Arial Black',14))
+title_Decrypt.place(x= 770,y=60)
 
+label_path_decrypt_ban_ma = Label(root,text= 'Đường dẫn')
+label_path_decrypt_ban_ma.place(x= 770,y=100)
+text_path_decrypt_ban_ma = Entry(root)
+text_path_decrypt_ban_ma.place(x= 840 , y= 100, width=220, height=20)
 
-label_giai_ma = Label(root,text= 'Văn bản')
-label_giai_ma.place(x= 770,y=170)
+but_File_encrypt = Button(root, text = 'Tệp mã hoá',bg='Cyan',width = '10', command=read_text_file_decrypt)
+but_File_encrypt.place(x= 1070,y=100)
 
-text_giai_ma= Entry(root)
-text_giai_ma.place(x= 840 , y= 150, width=220, height=100)
+label_decrypt_ban_ma = Label(root,text= 'Bản mã')
+label_decrypt_ban_ma.place(x= 770,y=170)
+text_decrypt_ban_ma= Entry(root)
+text_decrypt_ban_ma.place(x= 840 , y= 150, width=220, height=100)
 
-label_code_text_decrypt = Label(root,text= 'Codetext')
-label_code_text_decrypt.place(x= 770, y= 330)
+but_Decrypt= Button(root, text = 'Giải mã', bg= "Cyan", width= '10 ', command=decrypt)
+but_Decrypt.place(x= 890, y = 280)
 
-text_code_text_decrypt = Entry(root)
-text_code_text_decrypt.place(x= 840 , y= 360, width=220, height=100)
+label_decrypt_ban_ro = Label(root,text= 'Bản rõ')
+label_decrypt_ban_ro.place(x= 770, y= 330)
+text_decrypt_ban_ro = Entry(root)
+text_decrypt_ban_ro.place(x= 840 , y= 360, width=220, height=100)
 
-label_store_decrypt = Button(root,text = 'Lưu', bg = "Cyan", width = '10', height = '2')
+label_store_decrypt = Button(root,text = 'Lưu', bg = "Cyan", width = '10', height = '2', command=save_text_file_decrypt)
 label_store_decrypt.place(x= 1070, y = 360)
-
 
 
 root.mainloop()
