@@ -86,13 +86,13 @@ def encrypt():
         
         k = np.random.randint(1, p - 1)  # Chọn số ngẫu nhiên k
         
-        text = text_to_numbers(text_encrypt_ban_ro.get()) # lấy văn bản rõ từ file
+        text = text_to_numbers(text_encrypt_ban_ro.get("1.0", END)) # lấy văn bản rõ từ file
                 
         for i in range(len(text)):
             y1 = pow_modulo(alpha, k, p)
             y2 = (text[i] * pow_modulo(beta, k, p)) % p
             cipher.append((y1, y2))
-        text_encrypt_ban_ma.delete(0, END)
+        text_encrypt_ban_ma.delete("1.0", END)
         text_encrypt_ban_ma.insert(END, str(cipher)[1:-1])
     except IOError:
         print('Không thể mã hoá!')
@@ -117,7 +117,7 @@ def decrypt():
     p, a = int(private_key[0].strip()), int(private_key[1].strip())
     plain_text = []
     
-    data = '[' +text_decrypt_ban_ma.get() + ']' # Lấy đoạn mã đã bị mã hoá
+    data = '[' +text_decrypt_ban_ma.get("1.0", END) + ']' # Lấy đoạn mã đã bị mã hoá
     cipher = convert_string_to_tuple_list(data)
     
     try:
@@ -125,7 +125,7 @@ def decrypt():
             y1, y2 = c
             r_inv = mod_inverse(pow_modulo(y1, a, p), p)  # Tính nghịch đảo của r^x (mod p)
             plain_text.append((y2 * r_inv) % p)
-        text_decrypt_ban_ro.delete(0, END)
+        text_decrypt_ban_ro.delete("1.0", END)
         text_decrypt_ban_ro.insert(END, numbers_to_text(plain_text))
     except IOError:
         print('Không thể giải mãi!')
@@ -200,8 +200,8 @@ def delete_key():
 
 
 def push_code():
-    text_decrypt_ban_ma.delete(0, END)
-    text_decrypt_ban_ma.insert(END, text_encrypt_ban_ma.get())
+    text_decrypt_ban_ma.delete("1.0", END)
+    text_decrypt_ban_ma.insert(END, text_encrypt_ban_ma.get("1.0", END))
     
     
 def read_text_file_encrypt(file_path=None):
@@ -209,9 +209,9 @@ def read_text_file_encrypt(file_path=None):
     try:
         with open(file_path, 'r', encoding='utf-8') as file:
             text = ''.join(file.read())
-            text_encrypt_ban_ro.delete(0, END)
-            text_encrypt_ban_ro.insert(0, text)
-            print(text_encrypt_ban_ro.get())
+            text_encrypt_ban_ro.delete("1.0", END)
+            text_encrypt_ban_ro.insert(END, text)
+            print(text_encrypt_ban_ro.get("1.0", END))
     except IOError:
         print("Không thể đọc file.")
 
@@ -231,7 +231,7 @@ def read_text_file_decrypt():
     try:
         with open(file_path, 'r', encoding='utf-8') as file:
             text = file.read()
-            text_decrypt_ban_ma.delete(0, END)
+            text_decrypt_ban_ma.delete("1.0", END)
             text_decrypt_ban_ma.insert(END, text)
     except IOError:
         print("Không thể đọc file.")
@@ -314,7 +314,7 @@ but_File_text.place(x= 650,y=100)
 
 label_encrypt_ban_ro = Label(root,text= 'Bản rõ')
 label_encrypt_ban_ro.place(x= 350,y=170)
-text_encrypt_ban_ro = Entry(root)
+text_encrypt_ban_ro = Text(root)
 text_encrypt_ban_ro.place(x= 420 , y= 150, width=220, height=100)
 
 but_Encrypt = Button(root, text = 'Mã hoá',bg='Cyan',width = '10', command=encrypt)
@@ -322,7 +322,7 @@ but_Encrypt.place(x= 470,y=280)
 
 label_encrypt_ban_ma = Label(root,text= 'Bản mã')
 label_encrypt_ban_ma.place(x= 350, y= 330)
-text_encrypt_ban_ma = Entry(root)
+text_encrypt_ban_ma = Text(root)
 text_encrypt_ban_ma.place(x= 420 , y= 360, width=220, height=100)
 
 but_push = Button(root, text= 'Chuyển', bg = 'Cyan', width = '10', command=push_code)
@@ -346,7 +346,7 @@ but_File_encrypt.place(x= 1070,y=100)
 
 label_decrypt_ban_ma = Label(root,text= 'Bản mã')
 label_decrypt_ban_ma.place(x= 770,y=170)
-text_decrypt_ban_ma= Entry(root)
+text_decrypt_ban_ma= Text(root)
 text_decrypt_ban_ma.place(x= 840 , y= 150, width=220, height=100)
 
 but_Decrypt= Button(root, text = 'Giải mã', bg= "Cyan", width= '10 ', command=decrypt)
@@ -354,7 +354,7 @@ but_Decrypt.place(x= 890, y = 280)
 
 label_decrypt_ban_ro = Label(root,text= 'Bản rõ')
 label_decrypt_ban_ro.place(x= 770, y= 330)
-text_decrypt_ban_ro = Entry(root)
+text_decrypt_ban_ro = Text(root)
 text_decrypt_ban_ro.place(x= 840 , y= 360, width=220, height=100)
 
 label_store_decrypt = Button(root,text = 'Lưu', bg = "Cyan", width = '10', height = '2', command=save_text_file_decrypt)
