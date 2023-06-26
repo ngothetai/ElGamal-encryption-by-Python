@@ -30,12 +30,14 @@ def generate_random_prime(start, end):
             return number
 
 
+# Chuyển các cặp (y1, y2) thành Unicode
 def convert_to_string(pair):
     string = ""
     for y1, y2 in pair:
         string += chr(y1) + chr(y2)
     return string
 
+# Chuyển từ Unicode sang cặp (y1, y2)
 def convert_to_pair(string):
     pair = []
     length = len(string)
