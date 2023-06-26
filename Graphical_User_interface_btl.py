@@ -240,9 +240,9 @@ def read_text_file_encrypt(file_path=None):
 
 
 def save_text_file_encrypt():
-    encrypt = text_encrypt_ban_ma.get()
+    encrypt = text_encrypt_ban_ma.get("1.0", END)
     try:
-        with open(Duong_dan_ban_ma, 'w') as file:
+        with open(Duong_dan_ban_ma, 'w', encoding='utf-8') as file:
             file.write(encrypt)
         print("Ghi file thành công.")
     except IOError:
@@ -261,7 +261,7 @@ def read_text_file_decrypt():
         
         
 def save_text_file_decrypt():
-    encrypt = str(text_decrypt_ban_ro.get())
+    encrypt = str(text_decrypt_ban_ro.get("1.0", END))
     try:
         with open(Duong_dan_ban_ro, 'w', encoding='utf-8') as file:
             file.write(encrypt)
