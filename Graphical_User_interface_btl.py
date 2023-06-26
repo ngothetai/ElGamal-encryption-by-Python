@@ -30,6 +30,23 @@ def generate_random_prime(start, end):
             return number
 
 
+def convert_to_string(pair):
+    string = ""
+    for y1, y2 in pair:
+        string += chr(y1) + chr(y2)
+    return string
+
+def convert_to_pair(string):
+    pair = []
+    length = len(string)
+    if length % 2 == 1:
+        length -= 1  # Ignore the last character if the length is odd
+    for i in range(0, length, 2):
+        y1 = ord(string[i])
+        y2 = ord(string[i+1])
+        pair.append((y1, y2))
+    return pair[:-1]
+
 
 # Hàm chuyển đổi ký tự sang số
 def text_to_numbers(text):
@@ -92,8 +109,10 @@ def encrypt():
             y1 = pow_modulo(alpha, k, p)
             y2 = (text[i] * pow_modulo(beta, k, p)) % p
             cipher.append((y1, y2))
+        print(cipher)
+        cipher = convert_to_string(cipher)
         text_encrypt_ban_ma.delete("1.0", END)
-        text_encrypt_ban_ma.insert(END, str(cipher)[1:-1])
+        text_encrypt_ban_ma.insert(END, str(cipher))
     except IOError:
         print('Không thể mã hoá!')
 
@@ -113,12 +132,14 @@ def convert_string_to_tuple_list(string):
 
 # Hàm giải mã Elgamal
 def decrypt():
+    # Lấy khoá bí mật
     private_key = text_private_key.get()[1:-1].split(',')
     p, a = int(private_key[0].strip()), int(private_key[1].strip())
     plain_text = []
     
-    data = '[' +text_decrypt_ban_ma.get("1.0", END) + ']' # Lấy đoạn mã đã bị mã hoá
-    cipher = convert_string_to_tuple_list(data)
+    data = text_decrypt_ban_ma.get("1.0", END)  # Lấy đoạn mã đã bị mã hoá
+    cipher = convert_to_pair(data)
+    print(cipher)
     
     try:
         for c in cipher:
@@ -132,7 +153,7 @@ def decrypt():
 
 
 def random_key():
-    p = generate_random_prime(9000, 900000)
+    p = generate_random_prime(9000, 90000)
     Alpha = generate_random_prime(2, 200)
     a = generate_random_prime(200, 8999)
     text_P.delete(0, END)
